@@ -14,6 +14,10 @@ I architected this roster management tool as a modern, full-stack web applicatio
 - Dashboard: Responsive, edge-to-edge dark UI featuring state-managed tabs, hover-triggered tooltip matrix navigation, and brand-level filtering.
 - Relational Database Design: Normalized PostgreSQL schema for Brands, Employees, Pods, Processes, Leaves, and RosterEntries.
 
+## Bonus Features Implemented (Beyond the Basics)
+In alignment with Section 6 of the assessment guidelines, I prioritized reliable scheduling while implementing the following optional feature:
+- Automatic Roster Validation After Availability Changes: When an operations manager logs an approved leave via the frontend, the system automatically scans the database and instantly regenerates the conflict status for the existing roster, highlighting overlaps without requiring a manual month-wide schedule rebuild.
+
 ## Architectural Thinking & Design Decisions (Assessment Q&A)
 
 ### 1. How did you model employees, brands, processes, pods, and their relationships?
