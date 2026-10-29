@@ -75,3 +75,28 @@ def create_leave(leave: LeaveCreate, db: Session = Depends(get_db)):
         
     db.commit()
     return {"message": f"Leave recorded for Agent {leave.employee_id}. Conflicts dynamically updated."}
+
+# --- NEW: Manual Shift Reassignment (Editing) ---
+
+class ShiftUpdate(BaseModel):
+    employee_id: int
+    shift_date: date
+    new_brand_id: int
+
+@app.put("/roster/edit")
+def edit_shift(update: ShiftUpdate, db: Session = Depends(get_db)):
+    # Find the specific shift
+    entry = db.query(models.RosterEntry).filter(
+        models.RosterEntry.employee_id == update.employee_id,
+        models.RosterEntry.date == update.shift_date
+    ).first()
+    
+    if not entry:
+        raise HTTPException(status_code=404, detail="Shift not found for this date.")
+        
+    # Update the assignment and clear the conflict status since it was manually resolved
+    entry.brand_id = update.new_brand_id
+    entry.is_conflict = False
+    
+    db.commit()
+    return {"message": f"Shift reassigned successfully for Agent {update.employee_id}."}

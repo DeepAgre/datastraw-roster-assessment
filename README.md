@@ -6,12 +6,14 @@ Role: AI / Tech Intern Assessment
 ---
 
 ## Approach Note
-I architected this roster management tool as a modern, full-stack web application focusing on high-performance data generation and real-time operational flexibility. By decoupling a Python/FastAPI backend from a responsive React frontend, the system can dynamically validate thousands of monthly shift entries against live-updated agent leave constraints without requiring full-page reloads.
+I architected this roster management tool as a modern, full-stack web application focusing on high-performance data generation and real-time operational flexibility. By decoupling a Python/FastAPI backend from a responsive React frontend, the system can dynamically validate thousands of monthly shift entries against live-updated agent constraints without requiring full-page reloads.
 
 ## Core Features Built
 - Automated Monthly Roster Generation: Python-based scheduling engine iterating over multiple processes, pods, and client brands to output full monthly tables.
 - Dynamic Conflict Engine: Real-time database scanning. If an agent is manually logged for a leave date where a shift is assigned, the backend immediately flags an overlap.
-- Dashboard: Responsive, edge-to-edge dark UI featuring state-managed tabs, hover-triggered tooltip matrix navigation, and brand-level filtering.
+- Comprehensive Roster Filtering: Custom dropdown parameters to support full Company-wide, Pod-wise, Brand-wise, and Process-wise matrix views.
+- Manual Roster Editing & Resolution: Full operational controls to log sudden agent leaves (triggering conflict validation) and manually reassign specific shifts directly to resolve staffing overlaps.
+- Dashboard: Responsive, edge-to-edge dark UI featuring state-managed tabs and hover-triggered tooltip matrix navigation.
 - Relational Database Design: Normalized PostgreSQL schema for Brands, Employees, Pods, Processes, Leaves, and RosterEntries.
 
 ## Bonus Features Implemented (Beyond the Basics)
@@ -27,25 +29,25 @@ I utilized a normalized PostgreSQL relational schema. Employees act as the centr
 The FastAPI backend iterates through the target month's calendar, evaluating each day against brand-specific operating rules. It checks the active employee assignments and generates a RosterEntry for each working day. Constraints are validated retroactively: if a required shift is logged on a date matching an entry in the Leaves table, the engine updates that specific roster entry's conflict status to True.
 
 ### 3. How did you handle the difference between single-resource brands and brands with multiple employees?
-This was handled directly at the database mapping level. For single-resource brands (approx. 80% of the dataset), a single employee_id holds the sole mapping to a brand_id. For multi-resource brands, multiple employees share the same brand_id. The conflict engine groups coverage by brand_id, ensuring that if one employee takes leave, the system checks if the remaining mapped employees can fulfill the process coverage before flagging a critical gap.
+This was handled directly at the database mapping level. For single-resource brands, a single employee_id holds the sole mapping to a brand_id. For multi-resource brands, multiple employees share the same brand_id. The conflict engine groups coverage by brand_id, ensuring that if one employee takes leave, the system checks if the remaining mapped employees can fulfill the process coverage before flagging a critical gap.
 
 ### 4. What happens when an employee manages all processes for a brand but is unavailable on a required working day?
-When the operations manager logs the approved leave via the frontend, the /leaves POST endpoint inserts the leave record and retroactively scans the RosterEntry table. Because no other employees are mapped to that brand to provide backup coverage, the system immediately flags the shift as a critical conflict. This instantly surfaces on the UI's Conflicts tab so the manager can manually intervene.
+When the operations manager logs the approved leave via the frontend, the POST endpoint inserts the leave record and retroactively scans the RosterEntry table. Because no other employees are mapped to that brand to provide backup coverage, the system immediately flags the shift as a critical conflict. This instantly surfaces on the UI's Conflicts tab so the manager can use the manual reassignment tool to resolve it.
 
 ### 5. How does your system handle conflicting requirements or insufficient staffing?
 Rather than silently failing, freezing, or mathematically forcing an invalid assignment, the application prioritizes visibility. It generates the required shift to ensure client coverage rules are represented, but flags it as an unresolvable conflict. This guarantees that operations managers are explicitly alerted to staffing deficits prior to roster publication.
 
 ### 6. Which parts of the process did you automate, and which did you leave under human control? Why?
-- Automated: Bulk schedule generation (creating 900+ monthly shift entries), overlap detection, and real-time conflict flagging.
-- Human Control: Leave approval, final schedule publication, and backup resource assignment. 
+- Automated: Bulk schedule generation, overlap detection, and real-time conflict flagging.
+- Human Control: Leave approval, shift reassignment, and backup resource allocation. 
 - Why: Scheduling algorithms cannot account for sudden real-world nuances like emergencies or last-minute client demands. Automating the heavy data entry while leaving exception-handling to human judgment ensures flexibility and prevents algorithmic bottlenecks.
 
 ### 7. If the company doubled its team and brand count, what would you change about your solution?
-I would optimize the backend architecture for scale. Specifically, I would implement database connection pooling (e.g., PgBouncer), add frontend matrix pagination to prevent DOM overload, and offload the bulk roster generation to a background task worker (like Celery and Redis) so the main FastAPI thread remains non-blocking during computation.
+I would optimize the backend architecture for scale. Specifically, I would implement database connection pooling (like PgBouncer), add frontend matrix pagination to prevent DOM overload, and offload the bulk roster generation to a background task worker (like Celery and Redis) so the main FastAPI thread remains non-blocking during heavy computation.
 
 ### 8. If you had one additional week to work on this, what would you improve first?
-- Interactive Drag-and-Drop Editor: Upgrading the frontend matrix to allow operations managers to click, drag, and reassign backup shifts directly on the UI to resolve the flagged conflicts.
 - Role-Based Access Control (RBAC): Implementing JWT Authentication so only Managers can trigger roster generations and approve leaves, while Agents can only view their personal schedules.
+- Automated Testing: Writing comprehensive unit tests using PyTest for the FastAPI endpoints to mathematically guarantee the scheduling engine never assigns a shift during approved leave as the codebase scales.
 - Containerization: Wrapping the API, React app, and PostgreSQL database into Docker containers (docker-compose) for one-click environment setups across the engineering team.
 
 ## Local Setup Instructions
