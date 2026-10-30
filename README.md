@@ -7,7 +7,9 @@ Role: AI / Tech Intern Assessment
 
 ## 🎥 Demo Walkthrough Video
 Watch the complete system walkthrough, covering automated roster generation, multi-level brand/process filtering, and real-time conflict detection and resolution:
-https://drive.google.com/file/d/1TbbMdtOBuB_7PJp2sWoY4sVcqMrIEiN7/view?usp=sharing
+1) G-Drive link: https://drive.google.com/file/d/1TbbMdtOBuB_7PJp2sWoY4sVcqMrIEiN7/view?usp=sharing
+
+2) Youtube link: https://youtu.be/ZMsh0TAPft0
 
 ---
 
