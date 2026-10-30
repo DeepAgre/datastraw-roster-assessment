@@ -1,7 +1,13 @@
 # Datastraw Smart Roster Intelligence System
 
-Candidate Name: Deep Prakash Agre
+Candidate Name: Deep Prakash Agre  
 Role: AI / Tech Intern Assessment 
+
+---
+
+## 🎥 Demo Walkthrough Video
+Watch the complete system walkthrough, covering automated roster generation, multi-level brand/process filtering, and real-time conflict detection and resolution:
+https://drive.google.com/file/d/1TbbMdtOBuB_7PJp2sWoY4sVcqMrIEiN7/view?usp=sharing
 
 ---
 
@@ -26,13 +32,13 @@ In alignment with Section 6 of the assessment guidelines, I prioritized reliable
 I utilized a normalized PostgreSQL relational schema. Employees act as the central entity, containing foreign keys linking them to specific Pods and Brands. Processes were mapped to ensure that a single employee can be assigned to all processes for a single brand, or multiple employees can be linked to the same Brand ID but handle separate operational constraints.
 
 ### 2. How does your system generate a roster and determine whether it satisfies the required constraints?
-The FastAPI backend iterates through the target month's calendar, evaluating each day against brand-specific operating rules. It checks the active employee assignments and generates a RosterEntry for each working day. Constraints are validated retroactively: if a required shift is logged on a date matching an entry in the Leaves table, the engine updates that specific roster entry's conflict status to True.
+The FastAPI backend iterates through the target month's calendar, evaluating each day against brand-specific operating rules. It checks the active employee assignments and generates a `RosterEntry` for each working day. Constraints are validated retroactively: if a required shift is logged on a date matching an entry in the Leaves table, the engine updates that specific roster entry's conflict status to `True`.
 
 ### 3. How did you handle the difference between single-resource brands and brands with multiple employees?
-This was handled directly at the database mapping level. For single-resource brands, a single employee_id holds the sole mapping to a brand_id. For multi-resource brands, multiple employees share the same brand_id. The conflict engine groups coverage by brand_id, ensuring that if one employee takes leave, the system checks if the remaining mapped employees can fulfill the process coverage before flagging a critical gap.
+This was handled directly at the database mapping level. For single-resource brands, a single `employee_id` holds the sole mapping to a `brand_id`. For multi-resource brands, multiple employees share the same `brand_id`. The conflict engine groups coverage by `brand_id`, ensuring that if one employee takes leave, the system checks if the remaining mapped employees can fulfill the process coverage before flagging a critical gap.
 
 ### 4. What happens when an employee manages all processes for a brand but is unavailable on a required working day?
-When the operations manager logs the approved leave via the frontend, the POST endpoint inserts the leave record and retroactively scans the RosterEntry table. Because no other employees are mapped to that brand to provide backup coverage, the system immediately flags the shift as a critical conflict. This instantly surfaces on the UI's Conflicts tab so the manager can use the manual reassignment tool to resolve it.
+When the operations manager logs the approved leave via the frontend, the POST endpoint inserts the leave record and retroactively scans the `RosterEntry` table. Because no other employees are mapped to that brand to provide backup coverage, the system immediately flags the shift as a critical conflict. This instantly surfaces on the UI's Conflicts tab so the manager can use the manual reassignment tool to resolve it.
 
 ### 5. How does your system handle conflicting requirements or insufficient staffing?
 Rather than silently failing, freezing, or mathematically forcing an invalid assignment, the application prioritizes visibility. It generates the required shift to ensure client coverage rules are represented, but flags it as an unresolvable conflict. This guarantees that operations managers are explicitly alerted to staffing deficits prior to roster publication.
@@ -48,11 +54,11 @@ I would optimize the backend architecture for scale. Specifically, I would imple
 ### 8. If you had one additional week to work on this, what would you improve first?
 - Role-Based Access Control (RBAC): Implementing JWT Authentication so only Managers can trigger roster generations and approve leaves, while Agents can only view their personal schedules.
 - Automated Testing: Writing comprehensive unit tests using PyTest for the FastAPI endpoints to mathematically guarantee the scheduling engine never assigns a shift during approved leave as the codebase scales.
-- Containerization: Wrapping the API, React app, and PostgreSQL database into Docker containers (docker-compose) for one-click environment setups across the engineering team.
+- Containerization: Wrapping the API, React app, and PostgreSQL database into Docker containers (`docker-compose`) for one-click environment setups across the engineering team.
 
 ## Local Setup Instructions
 
 1. Clone the repository
 ```bash
-git clone [https://github.com/DeepAgre/datastraw-roster-assessment.git](https://github.com/DeepAgre/datastraw-roster-assessment.git)
+git clone https://github.com/DeepAgre/datastraw-roster-assessment.git
 cd datastraw-roster-assessment
