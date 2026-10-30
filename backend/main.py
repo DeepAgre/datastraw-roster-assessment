@@ -7,21 +7,21 @@ from database import SessionLocal, engine
 import models
 from scheduler import generate_monthly_roster
 
-# Create database tables
+
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Datastraw Smart Roster API")
 
-# Enable CORS so your React frontend can talk to FastAPI
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins for local testing
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Dependency to get database session
+
 def get_db():
     db = SessionLocal()
     try:
@@ -48,11 +48,11 @@ def get_roster_entries(db: Session = Depends(get_db)):
 
 @app.get("/conflicts")
 def get_conflict_entries(db: Session = Depends(get_db)):
-    # This directly answers Datastraw's core requirement: clear conflict detection!
+    
     conflicts = db.query(models.RosterEntry).filter(models.RosterEntry.is_conflict == True).all()
     return conflicts
 
-# --- NEW: Leave Management & Dynamic Conflict Validation ---
+
 
 class LeaveCreate(BaseModel):
     employee_id: int
@@ -60,11 +60,11 @@ class LeaveCreate(BaseModel):
 
 @app.post("/leaves")
 def create_leave(leave: LeaveCreate, db: Session = Depends(get_db)):
-    # 1. Add the new leave record to the database
+    
     new_leave = models.Leave(employee_id=leave.employee_id, leave_date=leave.leave_date)
     db.add(new_leave)
     
-    # 2. Retroactively scan the roster and flag a conflict if they are already scheduled
+   
     overlapping_entry = db.query(models.RosterEntry).filter(
         models.RosterEntry.employee_id == leave.employee_id,
         models.RosterEntry.date == leave.leave_date
@@ -76,7 +76,7 @@ def create_leave(leave: LeaveCreate, db: Session = Depends(get_db)):
     db.commit()
     return {"message": f"Leave recorded for Agent {leave.employee_id}. Conflicts dynamically updated."}
 
-# --- NEW: Manual Shift Reassignment (Editing) ---
+
 
 class ShiftUpdate(BaseModel):
     employee_id: int
@@ -85,7 +85,7 @@ class ShiftUpdate(BaseModel):
 
 @app.put("/roster/edit")
 def edit_shift(update: ShiftUpdate, db: Session = Depends(get_db)):
-    # Find the specific shift
+   
     entry = db.query(models.RosterEntry).filter(
         models.RosterEntry.employee_id == update.employee_id,
         models.RosterEntry.date == update.shift_date
@@ -94,7 +94,7 @@ def edit_shift(update: ShiftUpdate, db: Session = Depends(get_db)):
     if not entry:
         raise HTTPException(status_code=404, detail="Shift not found for this date.")
         
-    # Update the assignment and clear the conflict status since it was manually resolved
+   
     entry.brand_id = update.new_brand_id
     entry.is_conflict = False
     

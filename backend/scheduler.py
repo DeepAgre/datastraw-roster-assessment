@@ -29,19 +29,19 @@ def generate_monthly_roster(year: int, month: int):
 
     while current_date <= end_date:
         for emp in employees:
-            # Find a process related to the employee's brand
+            #
             brand_processes = [p for p in processes if p.brand_id == emp.brand_id]
             if not brand_processes:
                 continue
             
-            assigned_process = brand_processes[0] # Assign first available process for simplicity
+            assigned_process = brand_processes[0] 
 
-            # Check if employee is on leave on this date
+           
             is_on_leave = (emp.id in leaves and leaves[emp.id] == current_date)
             
             conflict_detected = False
             if is_on_leave:
-                conflict_detected = True  # Conflict: Employee scheduled while on leave!
+                conflict_detected = True  
 
             entry = RosterEntry(
                 date=current_date,
@@ -60,6 +60,6 @@ def generate_monthly_roster(year: int, month: int):
     print("✅ Roster generated successfully with conflict detection!")
 
 if __name__ == "__main__":
-    # Test generating roster for current year and month
+    
     today = date.today()
     generate_monthly_roster(today.year, today.month)

@@ -12,8 +12,8 @@ class Pod(Base):
     __tablename__ = "pods"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String)  # e.g., "Pod Alpha"
-    pod_lead = Column(String)  # e.g., "Manager John"
+    name = Column(String)  
+    pod_lead = Column(String)  
     brand_id = Column(Integer, ForeignKey("brands.id"))
 
 class Employee(Base):

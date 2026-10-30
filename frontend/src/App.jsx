@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://datastraw-backend-hay0.onrender.com";
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '';
