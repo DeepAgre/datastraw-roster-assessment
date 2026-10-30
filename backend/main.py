@@ -13,9 +13,16 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Datastraw Smart Roster API")
 
 
+origins = [
+    "https://datastraw-roster-assessment.vercel.app",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "*"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -48,7 +55,6 @@ def get_roster_entries(db: Session = Depends(get_db)):
 
 @app.get("/conflicts")
 def get_conflict_entries(db: Session = Depends(get_db)):
-    
     conflicts = db.query(models.RosterEntry).filter(models.RosterEntry.is_conflict == True).all()
     return conflicts
 
@@ -60,11 +66,9 @@ class LeaveCreate(BaseModel):
 
 @app.post("/leaves")
 def create_leave(leave: LeaveCreate, db: Session = Depends(get_db)):
-    
     new_leave = models.Leave(employee_id=leave.employee_id, leave_date=leave.leave_date)
     db.add(new_leave)
     
-   
     overlapping_entry = db.query(models.RosterEntry).filter(
         models.RosterEntry.employee_id == leave.employee_id,
         models.RosterEntry.date == leave.leave_date
@@ -85,7 +89,6 @@ class ShiftUpdate(BaseModel):
 
 @app.put("/roster/edit")
 def edit_shift(update: ShiftUpdate, db: Session = Depends(get_db)):
-   
     entry = db.query(models.RosterEntry).filter(
         models.RosterEntry.employee_id == update.employee_id,
         models.RosterEntry.date == update.shift_date
@@ -94,7 +97,6 @@ def edit_shift(update: ShiftUpdate, db: Session = Depends(get_db)):
     if not entry:
         raise HTTPException(status_code=404, detail="Shift not found for this date.")
         
-   
     entry.brand_id = update.new_brand_id
     entry.is_conflict = False
     

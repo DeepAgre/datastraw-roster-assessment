@@ -5,7 +5,7 @@ from models import Brand, Pod, Process, Employee, Leave, RosterEntry
 def seed_database():
     db = SessionLocal()
 
-    # Clear existing data in correct order (child tables first, parent tables last)
+    
     db.query(RosterEntry).delete()
     db.query(Leave).delete()
     db.query(Employee).delete()

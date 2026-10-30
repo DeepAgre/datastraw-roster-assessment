@@ -6,8 +6,7 @@ from models import Employee, Brand, Process, Leave, RosterEntry
 def generate_monthly_roster(year: int, month: int):
     db = SessionLocal()
     
-    # Clear old roster entries for this month if re-generating
-    # (Simplified for now: clear all roster entries)
+    
     db.query(RosterEntry).delete()
     db.commit()
 
@@ -15,7 +14,7 @@ def generate_monthly_roster(year: int, month: int):
     processes = db.query(Process).all()
     leaves = {leave.employee_id: leave.leave_date for leave in db.query(Leave).all()}
 
-    # Determine start and end date of the given month
+   
     start_date = date(year, month, 1)
     if month == 12:
         end_date = date(year + 1, 1, 1) - timedelta(days=1)
@@ -29,7 +28,7 @@ def generate_monthly_roster(year: int, month: int):
 
     while current_date <= end_date:
         for emp in employees:
-            #
+           
             brand_processes = [p for p in processes if p.brand_id == emp.brand_id]
             if not brand_processes:
                 continue
